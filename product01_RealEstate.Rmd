@@ -1,0 +1,43 @@
+---
+title: 'Data Product: MAP'
+author: "Kevin Joy"
+date: "12/4/2019"
+output: html_document
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Maryland Property Data
+The [Maryland Open Data Portal](https://opendata.maryland.gov/) provides numerous geographic and non-geographic datasets that are available for search and exploration. Built-in tools allow for visualization of the data in table, graph, dashboard or map format. The Portal is managed by DOIT with contributions from many State and Local agencies.  
+
+
+This project uses [Real Property Assesment  Data](https://opendata.maryland.gov/Business-and-Economy/Maryland-Real-Property-Assessments-Hidden-Property/ed4q-f8tm/data) to populate home values in Maryland
+
+```{r, echo=F, warning=F, message=F}
+library(tidyverse)
+library(leaflet)
+df = read.csv('rei_data_filt.csv')
+#sample
+df <- df %>% arrange(desc(price)) %>% head(100)
+leaflet() %>%
+  addTiles() %>% 
+  addMarkers(
+    lng = df$lon,
+    lat = df$lat,
+    popup = paste(sep="<br/>",
+                  paste0( "<b>",df$address, "</b>"),
+                  paste0("Price: ", format(df$price, big.mark = ",")),
+                  paste0("Sqft: ", format(df$living_area, big.mark = ",")),
+                  paste0("Year Built: ", df$year_built)
+    )
+  )
+
+```
+
+```{r,echo=F, warning=F, message=F}
+library(DT)
+DT::datatable(df)
+```
